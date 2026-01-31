@@ -1,36 +1,71 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-node-app
-  namespace: staging
+  name: cloud4future-node
+  namespace: app
+  labels:
+    app: cloud4future-node
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: my-node-app
+      app: cloud4future-node
   template:
     metadata:
       labels:
-        app: my-node-app
+        app: cloud4future-node
     spec:
+      serviceAccountName: cloud4future-node-sa
+
+      # Good practice
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+
       containers:
-        - name: app
-          image: __IMAGE_URI__
+        - name: cloud4future-node
+          image: REPLACE_IMAGE
+          imagePullPolicy: IfNotPresent
+
           ports:
-            - containerPort: 3000
+            - name: http
+              containerPort: 3000
+
+          env:
+            - name: PORT
+              value: "3000"
+            - name: NODE_ENV
+              value: "production"
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
-          readinessProbe:
-            httpGet: { path: /health, port: 3000 }
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet: { path: /health, port: 3000 }
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          resources:
-            requests: { cpu: "100m", memory: "128Mi" }
-            limits: { cpu: "500m", memory: "512Mi" }
