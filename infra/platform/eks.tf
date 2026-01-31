@@ -34,21 +34,15 @@ module "eks" {
     vpc-cni                = { most_recent = true }
     eks-pod-identity-agent = { most_recent = true }
   }
-
-  eks_managed_node_groups = {
-    default = {
-      name           = "mng-default"
-
-      # Force On-Demand (avoids EC2 Fleet/Spot request path)
-      capacity_type  = "ON_DEMAND"
-
-      # Use common instances (less capacity issues)
-      instance_types = ["t3.medium"]
-
-      desired_size   = 2
-      min_size       = 2
-      max_size       = 4
-      disk_size      = 30
+# REMOVE eks_managed_node_groups completely
+  fargate_profiles = {
+    staging = {
+      name = "staging"
+      selectors = [
+        {
+          namespace = "staging"
+        }
+      ]
     }
   }
 
