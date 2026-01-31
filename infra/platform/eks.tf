@@ -28,12 +28,12 @@ module "eks" {
 
   enable_irsa = true
 
-  cluster_addons = {
-    coredns                = { most_recent = true }
+    cluster_addons = {
     kube-proxy             = { most_recent = true }
     vpc-cni                = { most_recent = true }
     eks-pod-identity-agent = { most_recent = true }
   }
+
 # REMOVE eks_managed_node_groups completely
   fargate_profiles = {
     staging = {
