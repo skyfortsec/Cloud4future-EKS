@@ -38,13 +38,20 @@ module "eks" {
   eks_managed_node_groups = {
     default = {
       name           = "mng-default"
+
+      # Force On-Demand (avoids EC2 Fleet/Spot request path)
+      capacity_type  = "ON_DEMAND"
+
+      # Use common instances (less capacity issues)
       instance_types = ["t3.medium"]
+
       desired_size   = 2
       min_size       = 2
       max_size       = 4
       disk_size      = 30
     }
   }
+
 
   # Allow GitHub Actions role to administer the cluster (so kubectl in CI can deploy)
   access_entries = {
