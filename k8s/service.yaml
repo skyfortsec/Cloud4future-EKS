@@ -1,12 +1,6 @@
 apiVersion: v1
-kind: Service
+kind: ServiceAccount
 metadata:
-  name: my-node-app-svc
-  namespace: staging
-spec:
-  selector:
-    app: my-node-app
-  ports:
-    - port: 80
-      targetPort: 3000
-  type: ClusterIP
+  name: cloud4future-node-sa
+  namespace: app
+automountServiceAccountToken: false
